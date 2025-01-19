@@ -33,6 +33,7 @@ class Client:
         log_transcription=True,
         max_clients=4,
         max_connection_time=600,
+        callback=None,
     ):
         """
         Initializes a Client instance for audio recording and streaming to a server.
@@ -46,6 +47,7 @@ class Client:
             port (int): The port number for the WebSocket server.
             lang (str, optional): The selected language for transcription. Default is None.
             translate (bool, optional): Specifies if the task is translation. Default is False.
+            callback (function, optional): A callback function to handle received JSON messages. Default is None.
         """
         self.recording = False
         self.task = "transcribe"
@@ -63,6 +65,7 @@ class Client:
         self.log_transcription = log_transcription
         self.max_clients = max_clients
         self.max_connection_time = max_connection_time
+        self.callback = callback
 
         if translate:
             self.task = "translate"
@@ -173,6 +176,10 @@ class Client:
 
         if "segments" in message.keys():
             self.process_segments(message["segments"])
+
+        # Send the message to the callback function if it is provided
+        if self.callback is not None:
+            self.callback(message)
 
     def on_error(self, ws, error):
         print(f"[ERROR] WebSocket Error: {error}")
