@@ -40,7 +40,7 @@ class Client:
 
         If host and port are not provided, the WebSocket connection will not be established.
         When translate is True, the task will be set to "translate" instead of "transcribe".
-        he audio recording starts immediately upon initialization.
+        The audio recording starts immediately upon initialization.
 
         Args:
             host (str): The hostname or IP address of the server.
@@ -129,7 +129,7 @@ class Client:
         if self.log_transcription:
             # Truncate to last 3 entries for brevity.
             text = text[-3:]
-            utils.clear_screen()
+            #utils.clear_screen()
             utils.print_transcript(text)
 
     def on_message(self, ws, message):
@@ -174,8 +174,8 @@ class Client:
             )
             return
 
-        if "segments" in message.keys():
-            self.process_segments(message["segments"])
+        # if "segments" in message.keys():
+        #   self.process_segments(message["segments"])
 
         # Send the message to the callback function if it is provided
         if self.callback is not None:
@@ -225,7 +225,7 @@ class Client:
             message (bytes): The audio data packet in bytes to be sent to the server.
 
         """
-        try:
+        try:  
             self.client_socket.send(message, websocket.ABNF.OPCODE_BINARY)
         except Exception as e:
             print(e)
@@ -697,11 +697,12 @@ class TranscriptionClient(TranscriptionTeeClient):
         log_transcription=True,
         max_clients=4,
         max_connection_time=600,
+        callback=None,
     ):
         self.client = Client(
             host, port, lang, translate, model, srt_file_path=output_transcription_path,
             use_vad=use_vad, log_transcription=log_transcription, max_clients=max_clients,
-            max_connection_time=max_connection_time
+            max_connection_time=max_connection_time, callback=callback
         )
 
         if save_output_recording and not output_recording_filename.endswith(".wav"):
